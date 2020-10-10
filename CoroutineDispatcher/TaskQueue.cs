@@ -13,7 +13,7 @@ namespace CoroutineDispatcher
 			new Queue<Action>()
 		};
 
-		public void Add(Action action, DispatchPriority priority)
+		public void Add(DispatchPriority priority, Action action)
 		{
 			_pendingTasks[(int)priority].Enqueue(action);
 		}

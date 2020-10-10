@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace CoroutineDispatcher
 {
 	public class Dispatcher
 	{
+		[ThreadStatic]
+		private static Dispatcher _current;
+		public static Dispatcher Current => _current;
+
 		public void Start()
 		{
 
@@ -19,14 +24,19 @@ namespace CoroutineDispatcher
 
 		}
 
+		public ValueTask PushFrame()
+		{
+
+		}
+
 		//public T Invoke<T>()
 		//{
 
 		//}
 
-		public void InvokeAsync()
+		public async ValueTask InvokeAsync(Func<ValueTask> operation)
 		{
-
+			await operation();
 		}
 
 		//public Task<T> InvokeAsync<T>()
@@ -34,9 +44,19 @@ namespace CoroutineDispatcher
 
 		//}
 
-		public void Dispatch()
+		public void Dispatch(Action operation)
 		{
 
+		}
+
+		public void Dispatch(DispatchPriority priority, Action operation)
+		{
+
+		}
+
+		public static ValueTask Yield(DispatchPriority priority = DispatchPriority.Medium)
+		{
+			return new ValueTask(new Task())
 		}
 	}
 }

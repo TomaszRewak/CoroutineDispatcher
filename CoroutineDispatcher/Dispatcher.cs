@@ -9,6 +9,8 @@ namespace CoroutineDispatcher
 		private static Dispatcher _current;
 		public static Dispatcher Current => _current;
 
+		private readonly OperationQueue _operationQueue;
+
 		public void Start()
 		{
 
@@ -24,9 +26,12 @@ namespace CoroutineDispatcher
 
 		}
 
-		public ValueTask PushFrame()
+		public void PushFrame()
 		{
+			if (Current._operationQueue.TryDequeue(out var operation))
+			{
 
+			}
 		}
 
 		//public T Invoke<T>()
@@ -34,9 +39,9 @@ namespace CoroutineDispatcher
 
 		//}
 
-		public async ValueTask InvokeAsync(Func<ValueTask> operation)
+		public void InvokeAsync(Func<ValueTask> operation)
 		{
-			await operation();
+			operation();
 		}
 
 		//public Task<T> InvokeAsync<T>()
@@ -46,17 +51,25 @@ namespace CoroutineDispatcher
 
 		public void Dispatch(Action operation)
 		{
-
+			Dispatch(DispatchPriority.Medium, operation);
 		}
 
 		public void Dispatch(DispatchPriority priority, Action operation)
+		{
+			_operationQueue.Enqueue(priority, new Operation(operation));
+		}
+
+		public void Dispatch(Func<ValueTask> operation)
 		{
 
 		}
 
 		public static ValueTask Yield(DispatchPriority priority = DispatchPriority.Medium)
 		{
-			return new ValueTask(new Task())
+			if (!Current._operationQueue.TryDequeue(priority, out var operation))
+				return new ValueTask();
+
+			return operation.Invoke();
 		}
 	}
 }

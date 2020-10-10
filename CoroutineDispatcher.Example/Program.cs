@@ -5,11 +5,12 @@ namespace CoroutineDispatcher.Example
 {
 	class Program
 	{
-		static async void Main(string[] args)
+		static void Main(string[] args)
 		{
 			var dispatcher = new Dispatcher();
 
-			await dispatcher.InvokeAsync(AsyncAction2);
+			dispatcher.Dispatch(AsyncAction2);
+			dispatcher.PushFrame();
 		}
 
 		static void NormalAction()

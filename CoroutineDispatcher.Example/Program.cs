@@ -25,10 +25,9 @@ namespace CoroutineDispatcher.Example
 
 			Dispatcher.Current.Dispatch(DispatchPriority.High, NormalAction);
 			Dispatcher.Current.Dispatch(DispatchPriority.Medium, NormalAction);
+			Dispatcher.Current.Dispatch(DispatchPriority.Low, NormalAction);
 
-			await Dispatcher.Yield(DispatchPriority.High);
-
-			Dispatcher.Current.Dispatch(NormalAction);
+			await Dispatcher.Yield(DispatchPriority.Medium);
 		}
 
 		static async ValueTask AsyncAction2()

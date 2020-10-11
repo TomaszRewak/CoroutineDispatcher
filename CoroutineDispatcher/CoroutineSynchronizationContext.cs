@@ -9,22 +9,24 @@ namespace CoroutineDispatcher
 	internal sealed class CoroutineSynchronizationContext : SynchronizationContext
 	{
 		private readonly OperationQueue _queue = new OperationQueue();
+		private DispatchPriority _currentPriority = DispatchPriority.High;
 
 		public override void Post(SendOrPostCallback d, object state)
 		{
-			_queue.Enqueue(DispatchPriority.High, () => d(state));
+			_queue.Enqueue(new Operation(_currentPriority, () => d(state)));
 		}
 
-		public void Post(DispatchPriority priority, Action operation)
+		public void Post(Operation operation)
 		{
-			_queue.Enqueue(priority, operation);
+			_queue.Enqueue(operation);
 		}
 
 		public void Run()
 		{
 			while (_queue.TryDequeue(out var operation))
 			{
-				operation();
+				_currentPriority = operation.Priority;
+				operation.Action();
 			}
 		}
 

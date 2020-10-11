@@ -52,7 +52,7 @@ namespace CoroutineDispatcher
 
 		public void Dispatch(DispatchPriority priority, Action operation)
 		{
-			_synchronizationContext.Post(priority, operation);
+			_synchronizationContext.Post(new Operation(priority, operation));
 		}
 
 		public void Dispatch(Func<ValueTask> operation)
@@ -62,7 +62,7 @@ namespace CoroutineDispatcher
 
 		public void Dispatch(DispatchPriority priority, Func<ValueTask> operation)
 		{
-			_synchronizationContext.Post(priority, () => operation());
+			_synchronizationContext.Post(new Operation(priority, () => operation()));
 		}
 
 		public static ValueTask Yield(DispatchPriority priority)

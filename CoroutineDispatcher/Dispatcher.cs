@@ -28,9 +28,10 @@ namespace CoroutineDispatcher
 
 		public void PushFrame()
 		{
-			if (Current._operationQueue.TryDequeue(out var operation))
+			if (_operationQueue.TryDequeue(out var operation))
 			{
-
+				var task = operation.Invoke();
+				task.AsTask().
 			}
 		}
 
@@ -64,7 +65,7 @@ namespace CoroutineDispatcher
 
 		}
 
-		public static ValueTask Yield(DispatchPriority priority = DispatchPriority.Medium)
+		public static ValueTask Yield(DispatchPriority priority)
 		{
 			if (!Current._operationQueue.TryDequeue(priority, out var operation))
 				return new ValueTask();

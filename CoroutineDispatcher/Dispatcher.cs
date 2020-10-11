@@ -9,19 +9,15 @@ namespace CoroutineDispatcher
 		private static Dispatcher _current;
 		public static Dispatcher Current => _current;
 
+		private readonly CoroutineSynchronizationContext _synchronizationContext;
 		private readonly OperationQueue _operationQueue;
 
+		public Dispatcher()
+		{
+			_synchronizationContext = new CoroutineSynchronizationContext(this);
+		}
+
 		public void Start()
-		{
-
-		}
-
-		public static void Spawn()
-		{
-
-		}
-
-		public void Invoke()
 		{
 
 		}
@@ -33,6 +29,27 @@ namespace CoroutineDispatcher
 				var task = operation.Invoke();
 				task.AsTask().
 			}
+		}
+
+		private void ExecuteFrame()
+		{
+			if (!_operationQueue.TryDequeue(out var operation)) return;
+
+			var task = operation.Invoke();
+
+			if (task.IsCompleted) return;
+
+			task.AsTask().ContinueWith()
+		}
+
+		public static void Spawn()
+		{
+
+		}
+
+		public void Invoke()
+		{
+
 		}
 
 		//public T Invoke<T>()

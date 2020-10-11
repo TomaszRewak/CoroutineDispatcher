@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CoroutineDispatcher
@@ -6,40 +7,17 @@ namespace CoroutineDispatcher
 	public class Dispatcher
 	{
 		[ThreadStatic]
-		private static Dispatcher _current;
+		private static Dispatcher _current = null;
 		public static Dispatcher Current => _current;
 
-		private readonly CoroutineSynchronizationContext _synchronizationContext;
-		private readonly OperationQueue _operationQueue;
+		private readonly CoroutineSynchronizationContext _synchronizationContext = new CoroutineSynchronizationContext();
 
-		public Dispatcher()
+		public void Run()
 		{
-			_synchronizationContext = new CoroutineSynchronizationContext(this);
-		}
-
-		public void Start()
-		{
-
-		}
-
-		public void PushFrame()
-		{
-			if (_operationQueue.TryDequeue(out var operation))
-			{
-				var task = operation.Invoke();
-				task.AsTask().
-			}
-		}
-
-		private void ExecuteFrame()
-		{
-			if (!_operationQueue.TryDequeue(out var operation)) return;
-
-			var task = operation.Invoke();
-
-			if (task.IsCompleted) return;
-
-			task.AsTask().ContinueWith()
+			_current = this;
+			SynchronizationContext.SetSynchronizationContext(_synchronizationContext);
+			_synchronizationContext.Run();
+			_current = null;
 		}
 
 		public static void Spawn()
@@ -74,20 +52,22 @@ namespace CoroutineDispatcher
 
 		public void Dispatch(DispatchPriority priority, Action operation)
 		{
-			_operationQueue.Enqueue(priority, new Operation(operation));
+			_synchronizationContext.Post(priority, operation);
 		}
 
 		public void Dispatch(Func<ValueTask> operation)
 		{
+			Dispatch(DispatchPriority.Medium, operation);
+		}
 
+		public void Dispatch(DispatchPriority priority, Func<ValueTask> operation)
+		{
+			_synchronizationContext.Post(priority, () => operation());
 		}
 
 		public static ValueTask Yield(DispatchPriority priority)
 		{
-			if (!Current._operationQueue.TryDequeue(priority, out var operation))
-				return new ValueTask();
-
-			return operation.Invoke();
+			return new ValueTask();
 		}
 	}
 }

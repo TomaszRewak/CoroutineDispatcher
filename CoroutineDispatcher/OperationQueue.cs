@@ -19,25 +19,24 @@ namespace CoroutineDispatcher
 			_queuedOperations[(int)priority].Enqueue(operation);
 		}
 
-		public bool TryDequeue(out Action operation, out DispatchPriority operationPriotiry)
+		public bool TryDequeue(out Action operation)
 		{
-			return TryDequeue(DispatchPriority.Low, out operation, out operationPriotiry);
+			return TryDequeue(DispatchPriority.Low, out operation);
 		}
 
-		public bool TryDequeue(DispatchPriority minPriotirty, out Action operation, out DispatchPriority operationPriority)
+		public bool TryDequeue(DispatchPriority priority, out Action operation)
 		{
-			for (var i = DispatchPriority.High; i >= minPriotirty; i--)
+			for (var i = DispatchPriority.High; i >= priority; i--)
 			{
-				if (_queuedOperations.Any())
+				var queue = _queuedOperations[(int)i];
+				if (queue.Any())
 				{
-					operation = _queuedOperations[(int)i].Dequeue();
-					operationPriority = i;
+					operation = queue.Dequeue();
 					return true;
 				}
 			}
 
 			operation = default;
-			operationPriority = default;
 			return false;
 		}
 	}

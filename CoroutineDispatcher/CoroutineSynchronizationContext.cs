@@ -8,12 +8,7 @@ namespace CoroutineDispatcher
 {
 	internal sealed class CoroutineSynchronizationContext : SynchronizationContext
 	{
-		private readonly OperationQueue _queue;
-		private DispatchPriority _currentPriority;
-
-		public CoroutineSynchronizationContext()
-		{
-		}
+		private readonly OperationQueue _queue = new OperationQueue();
 
 		public override void Post(SendOrPostCallback d, object state)
 		{
@@ -25,16 +20,11 @@ namespace CoroutineDispatcher
 			_queue.Enqueue(priority, operation);
 		}
 
-		public void ExecuteFrame()
+		public void Run()
 		{
-			if (_queue.TryDequeue(out var operation, out var priority))
+			while (_queue.TryDequeue(out var operation))
 			{
-				_currentPriority = priority;
 				operation();
-			}
-			else
-			{
-
 			}
 		}
 

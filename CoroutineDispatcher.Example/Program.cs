@@ -34,6 +34,8 @@ namespace CoroutineDispatcher.Example
 		{
 			Console.WriteLine($"AsyncAction2 {Thread.CurrentThread.ManagedThreadId}");
 
+			//await Task.Delay(100);
+
 			await AsyncAction1();
 			await Task.Yield();
 			await AsyncAction1();

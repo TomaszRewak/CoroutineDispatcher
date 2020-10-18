@@ -65,9 +65,9 @@ namespace CoroutineDispatcher
 			_synchronizationContext.Post(new Operation(priority, () => operation()));
 		}
 
-		public static ValueTask Yield(DispatchPriority priority)
+		public static YieldTask Yield(DispatchPriority priority)
 		{
-			return new ValueTask();
+			return new YieldTask(priority);
 		}
 	}
 }

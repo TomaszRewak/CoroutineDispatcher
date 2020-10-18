@@ -39,5 +39,19 @@ namespace CoroutineDispatcher
 			operation = default;
 			return false;
 		}
+
+		public bool Any(DispatchPriority minPriority)
+		{
+			for (var priority = DispatchPriority.High; priority >= minPriority; priority--)
+			{
+				var queue = _queuedOperations[(int)priority];
+				if (queue.Any())
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

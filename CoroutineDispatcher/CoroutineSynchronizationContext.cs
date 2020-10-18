@@ -49,5 +49,10 @@ namespace CoroutineDispatcher
 		{
 			base.OperationCompleted();
 		}
+
+		internal bool HasQueuedTasks(DispatchPriority priority)
+		{
+			return _queue.Any(priority);
+		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CoroutineDispatcher
 {
-	public readonly struct Operation
+	internal readonly struct Operation
 	{
 		public readonly DispatchPriority Priority;
 		public readonly Action Action;

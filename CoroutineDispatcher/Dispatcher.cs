@@ -12,22 +12,41 @@ namespace CoroutineDispatcher
 
 		private readonly CoroutineSynchronizationContext _synchronizationContext = new CoroutineSynchronizationContext();
 
-		public void Run()
+		public void Start()
 		{
 			_current = this;
 			SynchronizationContext.SetSynchronizationContext(_synchronizationContext);
-			_synchronizationContext.Run();
+			_synchronizationContext.Execute();
 			_current = null;
 		}
 
-		public static void Spawn()
+		public void Stop()
 		{
 
 		}
 
-		public void Invoke()
+		public void Execute()
 		{
+			_current = this;
+			SynchronizationContext.SetSynchronizationContext(_synchronizationContext);
+			_synchronizationContext.Execute();
+			_current = null;
+		}
 
+		public static Dispatcher Spawn()
+		{
+			var dispatcher = new Dispatcher();
+			var thread = new Thread(() => {
+				dispatcher.Start();
+			});
+			thread.Start();
+
+			return dispatcher;
+		}
+
+		public void Invoke(Action operation)
+		{
+			_synchronizationContext.Send(operation);
 		}
 
 		//public T Invoke<T>()
@@ -35,10 +54,10 @@ namespace CoroutineDispatcher
 
 		//}
 
-		public void InvokeAsync(Func<ValueTask> operation)
-		{
-			operation();
-		}
+		//public void InvokeAsync(Func<ValueTask> operation)
+		//{
+		//	operation();
+		//}
 
 		//public Task<T> InvokeAsync<T>()
 		//{

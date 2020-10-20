@@ -11,7 +11,7 @@ namespace CoroutineDispatcher.Example
 			var dispatcher = new Dispatcher();
 
 			dispatcher.Dispatch(AsyncAction2);
-			dispatcher.Run();
+			dispatcher.Execute();
 		}
 
 		static void NormalAction()

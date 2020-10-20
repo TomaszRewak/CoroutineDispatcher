@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,11 @@ namespace CoroutineDispatcher
 {
 	internal sealed class OperationQueue
 	{
-		private readonly Queue<Action>[] _queuedOperations = new Queue<Action>[]
+		private readonly ConcurrentQueue<Action>[] _queuedOperations = new ConcurrentQueue<Action>[]
 		{
-			new Queue<Action>(),
-			new Queue<Action>(),
-			new Queue<Action>()
+			new ConcurrentQueue<Action>(),
+			new ConcurrentQueue<Action>(),
+			new ConcurrentQueue<Action>()
 		};
 
 		public void Enqueue(DispatchPriority priority, Action operation)
@@ -29,11 +30,8 @@ namespace CoroutineDispatcher
 			for (var priority = DispatchPriority.High; priority >= minPriority; priority--)
 			{
 				var queue = _queuedOperations[(int)priority];
-				if (queue.Any())
-				{
-					operation = queue.Dequeue();
+				if (queue.TryDequeue(out operation))
 					return true;
-				}
 			}
 
 			operation = default;

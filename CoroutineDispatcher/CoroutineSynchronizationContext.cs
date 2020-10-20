@@ -9,6 +9,12 @@ namespace CoroutineDispatcher
 	internal sealed class CoroutineSynchronizationContext : SynchronizationContext
 	{
 		private readonly OperationQueue _queue = new OperationQueue();
+		private CancellationTokenSource _waitToken;
+
+		internal void Start()
+		{
+			Execute();
+		}
 
 		internal void Execute()
 		{

@@ -14,24 +14,24 @@ namespace CoroutineDispatcher
 			new Queue<Action>()
 		};
 
-		public void Enqueue(Operation operation)
+		public void Enqueue(DispatchPriority priority, Action operation)
 		{
-			_queuedOperations[(int)operation.Priority].Enqueue(operation.Action);
+			_queuedOperations[(int)priority].Enqueue(operation);
 		}
 
-		public bool TryDequeue(out Operation operation)
+		public bool TryDequeue(out Action operation)
 		{
 			return TryDequeue(DispatchPriority.Low, out operation);
 		}
 
-		public bool TryDequeue(DispatchPriority minPriority, out Operation operation)
+		public bool TryDequeue(DispatchPriority minPriority, out Action operation)
 		{
 			for (var priority = DispatchPriority.High; priority >= minPriority; priority--)
 			{
 				var queue = _queuedOperations[(int)priority];
 				if (queue.Any())
 				{
-					operation = new Operation(priority, queue.Dequeue());
+					operation = queue.Dequeue();
 					return true;
 				}
 			}

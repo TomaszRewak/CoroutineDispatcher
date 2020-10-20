@@ -9,44 +9,40 @@ namespace CoroutineDispatcher
 	internal sealed class CoroutineSynchronizationContext : SynchronizationContext
 	{
 		private readonly OperationQueue _queue = new OperationQueue();
-		private DispatchPriority _currentPriority = DispatchPriority.High;
 
 		internal void Execute()
 		{
 			while (_queue.TryDequeue(out var operation))
-			{
-				_currentPriority = operation.Priority;
-				operation.Action();
-			}
+				operation();
 		}
 
 		public override void Post(SendOrPostCallback d, object state)
 		{
-			_queue.Enqueue(new Operation(_currentPriority, () => d(state)));
+			Post(DispatchPriority.Medium, () => d(state));
 		}
 
-		public void Post(Operation operation)
+		public void Post(DispatchPriority priority, Action operation)
 		{
-			_queue.Enqueue(operation);
+			_queue.Enqueue(priority, operation);
 		}
 
 		public override void Send(SendOrPostCallback d, object state)
 		{
-			base.Send(d, state);
+			Send(DispatchPriority.Medium, () => d(state)).Wait();
 		}
 
-		public ValueTask Send(Operation operation)
+		public Task Send(DispatchPriority priority, Action operation)
 		{
-			var task = new Task(operation.Action);
-			Post(new Operation(operation.Priority, () => task.RunSynchronously()));
-			return new ValueTask(task);
+			var task = new Task(operation);
+			Post(priority, () => task.RunSynchronously());
+			return task;
 		}
 
-		public ValueTask<T> Send<T>(DispatchPriority priority, Func<T> operation)
+		public Task<T> Send<T>(DispatchPriority priority, Func<T> operation)
 		{
 			var task = new Task<T>(operation);
-			Post(new Operation(priority, () => task.RunSynchronously()));
-			return new ValueTask<T>(task);
+			Post(priority, () => task.RunSynchronously());
+			return task;
 		}
 
 		public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)

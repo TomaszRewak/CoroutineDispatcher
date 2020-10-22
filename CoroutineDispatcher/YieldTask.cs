@@ -46,7 +46,7 @@ namespace CoroutineDispatcher
 			if (!(SynchronizationContext.Current is CoroutineSynchronizationContext context))
 				throw new InvalidOperationException("Awaiting Dispatcher.Yield aoutside of CoroutineSynchronizationContext");
 
-			context.Post(new Operation(_priority, continuation));
+			context.Post(_priority, continuation);
 		}
 
 		public void GetResult()

@@ -46,7 +46,12 @@ namespace CoroutineDispatcher
 
 		public void Invoke(Action operation)
 		{
-			_synchronizationContext.Send(operation);
+			Invoke(DispatchPriority.Medium, operation);
+		}
+
+		public void Invoke(DispatchPriority priority, Action operation)
+		{
+			_synchronizationContext.Send(priority, operation);
 		}
 
 		//public T Invoke<T>()
@@ -71,7 +76,7 @@ namespace CoroutineDispatcher
 
 		public void Dispatch(DispatchPriority priority, Action operation)
 		{
-			_synchronizationContext.Post(new Operation(priority, operation));
+			_synchronizationContext.Post(priority, operation);
 		}
 
 		public void Dispatch(Func<ValueTask> operation)
@@ -81,7 +86,7 @@ namespace CoroutineDispatcher
 
 		public void Dispatch(DispatchPriority priority, Func<ValueTask> operation)
 		{
-			_synchronizationContext.Post(new Operation(priority, () => operation()));
+			_synchronizationContext.Post(priority, () => operation());
 		}
 
 		public static YieldTask Yield(DispatchPriority priority)

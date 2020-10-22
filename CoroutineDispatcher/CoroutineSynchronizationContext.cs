@@ -22,49 +22,54 @@ namespace CoroutineDispatcher
 				operation();
 		}
 
-		public override void Post(SendOrPostCallback d, object state)
-		{
-			Post(DispatchPriority.Medium, () => d(state));
-		}
-
-		public void Post(DispatchPriority priority, Action operation)
-		{
-			_queue.Enqueue(priority, operation);
-		}
-
 		public override void Send(SendOrPostCallback d, object state)
 		{
 			Send(DispatchPriority.Medium, () => d(state)).Wait();
 		}
 
-		public Task Send(DispatchPriority priority, Action operation)
+		internal Task Send(DispatchPriority priority, Action operation)
 		{
 			var task = new Task(operation);
 			Post(priority, () => task.RunSynchronously());
 			return task;
 		}
 
-		public Task<T> Send<T>(DispatchPriority priority, Func<T> operation)
+		internal Task<T> Send<T>(DispatchPriority priority, Func<T> operation)
 		{
 			var task = new Task<T>(operation);
 			Post(priority, () => task.RunSynchronously());
 			return task;
 		}
 
-		public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
+		public override void Post(SendOrPostCallback d, object state)
 		{
-			return base.Wait(waitHandles, waitAll, millisecondsTimeout);
+			Post(DispatchPriority.Medium, () => d(state));
 		}
 
-		public override void OperationStarted()
+		internal void Post(DispatchPriority priority, Action operation)
 		{
-			base.OperationStarted();
+			_queue.Enqueue(priority, operation);
 		}
 
-		public override void OperationCompleted()
+		internal void PostDelayed(DateTime dateTime, DispatchPriority priority, Action action)
 		{
-			base.OperationCompleted();
+
 		}
+
+		//public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
+		//{
+		//	return base.Wait(waitHandles, waitAll, millisecondsTimeout);
+		//}
+
+		//public override void OperationStarted()
+		//{
+		//	base.OperationStarted();
+		//}
+
+		//public override void OperationCompleted()
+		//{
+		//	base.OperationCompleted();
+		//}
 
 		internal bool HasQueuedTasks(DispatchPriority priority)
 		{

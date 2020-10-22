@@ -1,23 +1,24 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CoroutineDispatcher
 {
 	internal sealed class OperationQueue
 	{
-		private readonly ConcurrentQueue<Action>[] _queuedOperations = new ConcurrentQueue<Action>[]
+		private readonly object _lock = new object();
+		private readonly Queue<Action>[] _queuedOperations = new Queue<Action>[]
 		{
-			new ConcurrentQueue<Action>(),
-			new ConcurrentQueue<Action>(),
-			new ConcurrentQueue<Action>()
+			new Queue<Action>(),
+			new Queue<Action>(),
+			new Queue<Action>()
 		};
 
 		public void Enqueue(DispatchPriority priority, Action operation)
 		{
-			_queuedOperations[(int)priority].Enqueue(operation);
+			lock (_lock)
+			{
+				_queuedOperations[(int)priority].Enqueue(operation);
+			}
 		}
 
 		public bool TryDequeue(out Action operation)
@@ -27,29 +28,39 @@ namespace CoroutineDispatcher
 
 		public bool TryDequeue(DispatchPriority minPriority, out Action operation)
 		{
-			for (var priority = DispatchPriority.High; priority >= minPriority; priority--)
+			lock (_lock)
 			{
-				var queue = _queuedOperations[(int)priority];
-				if (queue.TryDequeue(out operation))
-					return true;
+				for (var priority = DispatchPriority.High; priority >= minPriority; --priority)
+				{
+					var queue = _queuedOperations[(int)priority];
+					if (queue.Count > 0)
+					{
+						operation = queue.Dequeue();
+						return true;
+					}
+				}
 			}
 
 			operation = default;
 			return false;
 		}
 
-		public bool Any(DispatchPriority minPriority)
+		public int Count(DispatchPriority minPriority)
 		{
-			for (var priority = DispatchPriority.High; priority >= minPriority; priority--)
+			int count = 0;
+
+			lock (_lock)
 			{
-				var queue = _queuedOperations[(int)priority];
-				if (queue.Any())
-				{
-					return true;
-				}
+				for (var priority = DispatchPriority.High; priority >= minPriority; --priority)
+					count += _queuedOperations[(int)priority].Count;
 			}
 
-			return false;
+			return count;
+		}
+
+		public bool Any(DispatchPriority minPriority)
+		{
+			return Count(minPriority) > 0;
 		}
 	}
 }

@@ -54,20 +54,25 @@ namespace CoroutineDispatcher
 			_synchronizationContext.Send(priority, operation);
 		}
 
-		//public T Invoke<T>()
-		//{
+		public T Invoke<T>(Func<T> operation)
+		{
+			return InvokeAsync(operation).Result;
+		}
 
-		//}
+		public T Invoke<T>(DispatchPriority priority, Func<T> operation)
+		{
+			return InvokeAsync(priority, operation).Result;
+		}
 
-		//public void InvokeAsync(Func<ValueTask> operation)
-		//{
-		//	operation();
-		//}
+		public Task<T> InvokeAsync<T>(Func<T> operation)
+		{
+			return InvokeAsync(DispatchPriority.Medium, operation);
+		}
 
-		//public Task<T> InvokeAsync<T>()
-		//{
-
-		//}
+		public Task<T> InvokeAsync<T>(DispatchPriority priority, Func<T> operation)
+		{
+			return _synchronizationContext.Send(priority, operation);
+		}
 
 		public void Dispatch(Action operation)
 		{

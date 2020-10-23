@@ -10,31 +10,57 @@ namespace CoroutineDispatcher
 	{
 		private readonly OperationQueue _operationQueue = new OperationQueue();
 		private readonly TimerQueue _timerQueue = new TimerQueue();
+
+		private bool _running;
 		private CancellationTokenSource _waitToken;
 
 		internal void Start()
 		{
-			while(true)
+			_running = true;
+
+			while (_running)
 			{
-				_waitToken = null;
-
-				Execute();
-
-				_waitToken = new CancellationTokenSource();
-				_waitToken.CancelAfter(_timerQueue.Next - DateTime.UtcNow);
-				_waitToken.Token.WaitHandle.WaitOne();
+				ExecuteAvailableOperations();
+				WaitForPendingOperations();
 			}
 		}
 
 		internal void Execute()
 		{
+			_running = true;
+			ExecuteAvailableOperations();
+		}
+
+		internal void Stop()
+		{
+			_running = false;
+			_waitToken?.Cancel();
+		}
+
+		private void ExecuteAvailableOperations()
+		{
+			_waitToken = null;
+
 			FlushTimerQueue();
 
-			while (_operationQueue.TryDequeue(out var operation))
+			while (_running && _operationQueue.TryDequeue(out var operation))
 			{
 				operation();
 				FlushTimerQueue();
 			}
+		}
+
+		private void WaitForPendingOperations()
+		{
+			if (!_running)
+				return;
+
+			_waitToken = new CancellationTokenSource();
+
+			if (_timerQueue.Next is DateTime next)
+				_waitToken.CancelAfter(next - DateTime.UtcNow);
+
+			_waitToken.Token.WaitHandle.WaitOne();
 		}
 
 		public override void Send(SendOrPostCallback d, object state)
@@ -64,6 +90,7 @@ namespace CoroutineDispatcher
 		internal void Post(DispatchPriority priority, Action operation)
 		{
 			_operationQueue.Enqueue(priority, operation);
+			_waitToken?.Cancel();
 		}
 
 		internal void PostDelayed(DateTime dateTime, DispatchPriority priority, Action action)
@@ -72,10 +99,11 @@ namespace CoroutineDispatcher
 			_waitToken?.Cancel();
 		}
 
-		//public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
-		//{
-		//	return base.Wait(waitHandles, waitAll, millisecondsTimeout);
-		//}
+		public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
+		{
+			throw new NotImplementedException();
+			//return base.Wait(waitHandles, waitAll, millisecondsTimeout);
+		}
 
 		//public override void OperationStarted()
 		//{

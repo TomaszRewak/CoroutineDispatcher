@@ -8,7 +8,7 @@ namespace CoroutineDispatcher
 		private readonly object _lock = new object();
 		private readonly SortedSet<(DateTime Timestamp, DispatchPriority Priority, Action Action)> _operations = new SortedSet<(DateTime, DispatchPriority, Action)>();
 
-		public DateTime Next
+		public DateTime? Next
 		{
 			get
 			{
@@ -17,7 +17,7 @@ namespace CoroutineDispatcher
 					var enumerator = _operations.GetEnumerator();
 					return enumerator.MoveNext()
 						? enumerator.Current.Timestamp
-						: DateTime.MaxValue;
+						: (DateTime?)null;
 				}
 			}
 		}

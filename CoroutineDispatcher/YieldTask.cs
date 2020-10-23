@@ -33,7 +33,7 @@ namespace CoroutineDispatcher
 			get
 			{
 				if (!(SynchronizationContext.Current is CoroutineSynchronizationContext context))
-					throw new InvalidOperationException("Awaiting Dispatcher.Yield aoutside of CoroutineSynchronizationContext");
+					throw new DispatcherException("Awaiting Dispatcher.Yield outside of CoroutineSynchronizationContext");
 
 				return !context.HasQueuedTasks(_priority);
 			}
@@ -42,7 +42,7 @@ namespace CoroutineDispatcher
 		public void OnCompleted(Action continuation)
 		{
 			if (!(SynchronizationContext.Current is CoroutineSynchronizationContext context))
-				throw new InvalidOperationException("Awaiting Dispatcher.Yield aoutside of CoroutineSynchronizationContext");
+				throw new DispatcherException("Awaiting Dispatcher.Yield outside of CoroutineSynchronizationContext");
 
 			context.Post(_priority, continuation);
 		}

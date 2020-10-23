@@ -14,27 +14,21 @@ namespace CoroutineDispatcher.Test
 		private Thread _mainThread;
 		private int _callNo;
 
+		[TestInitialize]
+		public void Setup()
+		{
+			_dispatcher = new Dispatcher();
+			_mainThread = Thread.CurrentThread;
+		}
+
 		private void Dispatch(Action action) => _dispatcher.Dispatch(action);
 		private void Dispatch(DispatchPriority priority, Action action) => _dispatcher.Dispatch(priority, action);
 		private void Dispatch(Func<Task> action) => _dispatcher.Dispatch(action);
 		private void Dispatch(DispatchPriority priority, Func<Task> action) => _dispatcher.Dispatch(priority, action);
 
-		private void Execute()
-		{
-			_mainThread = Thread.CurrentThread;
-			_dispatcher.Execute();
-		}
-
-		private void Start()
-		{
-			_mainThread = Thread.CurrentThread;
-			_dispatcher.Start();
-		}
-
-		private void Stop()
-		{
-			_dispatcher.Stop();
-		}
+		private void Execute() => _dispatcher.Execute();
+		private void Start() => _dispatcher.Start();
+		private void Stop() => _dispatcher.Stop();
 
 		private void AssertCall(int order)
 		{

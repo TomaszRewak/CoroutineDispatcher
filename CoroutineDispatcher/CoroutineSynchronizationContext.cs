@@ -65,7 +65,7 @@ namespace CoroutineDispatcher
 
 		public override void Send(SendOrPostCallback d, object state)
 		{
-			Send(DispatchPriority.Medium, () => d(state)).Wait();
+			Send(DispatchPriority.High, () => d(state)).Wait();
 		}
 
 		internal Task Send(DispatchPriority priority, Action operation)
@@ -84,7 +84,7 @@ namespace CoroutineDispatcher
 
 		public override void Post(SendOrPostCallback d, object state)
 		{
-			Post(DispatchPriority.Medium, () => d(state));
+			Post(DispatchPriority.High, () => d(state));
 		}
 
 		internal void Post(DispatchPriority priority, Action operation)

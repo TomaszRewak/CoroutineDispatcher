@@ -7,12 +7,6 @@ namespace CoroutineDispatcher.Test
 	[TestClass]
 	public partial class DispatcherTest
 	{
-		[TestInitialize]
-		public void Setup()
-		{
-			_dispatcher = new Dispatcher();
-		}
-
 		[TestMethod]
 		public void ExecutesQueuedOperations()
 		{

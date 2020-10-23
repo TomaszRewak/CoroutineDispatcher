@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30404.54
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoroutineDispatcher", "CoroutineDispatcher\CoroutineDispatcher.csproj", "{8E42B59B-41E1-4F19-9444-4DD35707575A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoroutineDispatcher.Example", "CoroutineDispatcher.Example\CoroutineDispatcher.Example.csproj", "{D058DC40-3049-4713-89D6-8E1F9A0AA57A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoroutineDispatcher.Example", "CoroutineDispatcher.Example\CoroutineDispatcher.Example.csproj", "{D058DC40-3049-4713-89D6-8E1F9A0AA57A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoroutineDispatcher.Test", "CoroutineDispatcher.Test\CoroutineDispatcher.Test.csproj", "{1D06E1B0-6F72-4337-A2AC-48AF77A876EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{D058DC40-3049-4713-89D6-8E1F9A0AA57A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D058DC40-3049-4713-89D6-8E1F9A0AA57A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D058DC40-3049-4713-89D6-8E1F9A0AA57A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D06E1B0-6F72-4337-A2AC-48AF77A876EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D06E1B0-6F72-4337-A2AC-48AF77A876EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D06E1B0-6F72-4337-A2AC-48AF77A876EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D06E1B0-6F72-4337-A2AC-48AF77A876EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

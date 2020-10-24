@@ -6,7 +6,9 @@ namespace CoroutineDispatcher
 	internal sealed class TimerQueue
 	{
 		private readonly object _lock = new object();
-		private readonly SortedSet<(DateTime Timestamp, DispatchPriority Priority, Action Action)> _operations = new SortedSet<(DateTime, DispatchPriority, Action)>();
+		private readonly SortedSet<(DateTime Timestamp, DispatchPriority Priority, Action Action, int Index)> _operations = new SortedSet<(DateTime, DispatchPriority, Action, int)>();
+
+		private int _operationIndex;
 
 		public DateTime? Next
 		{
@@ -26,7 +28,8 @@ namespace CoroutineDispatcher
 		{
 			lock (_lock)
 			{
-				_operations.Add((timestamp, priority, action));
+				unchecked { _operationIndex++; }
+				_operations.Add((timestamp, priority, action, _operationIndex));
 			}
 		}
 
@@ -42,7 +45,7 @@ namespace CoroutineDispatcher
 
 					_operations.Remove(enumerator.Current);
 
-					return false;
+					return true;
 				}
 				else
 				{

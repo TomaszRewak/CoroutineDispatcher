@@ -39,8 +39,6 @@ namespace CoroutineDispatcher
 
 		private void ExecuteAvailableOperations()
 		{
-			_waitToken = null;
-
 			FlushTimerQueue();
 
 			while (_running && _operationQueue.TryDequeue(out var operation))
@@ -61,6 +59,7 @@ namespace CoroutineDispatcher
 				_waitToken.CancelAfter(next - DateTime.UtcNow);
 
 			_waitToken.Token.WaitHandle.WaitOne();
+			_waitToken = null;
 		}
 
 		public override void Send(SendOrPostCallback d, object state)

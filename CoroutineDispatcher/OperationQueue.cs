@@ -23,14 +23,9 @@ namespace CoroutineDispatcher
 
 		public bool TryDequeue(out Action operation)
 		{
-			return TryDequeue(DispatchPriority.Low, out operation);
-		}
-
-		public bool TryDequeue(DispatchPriority minPriority, out Action operation)
-		{
 			lock (_lock)
 			{
-				for (var priority = DispatchPriority.High; priority >= minPriority; --priority)
+				for (var priority = DispatchPriority.High; priority >= DispatchPriority.Low; --priority)
 				{
 					var queue = _queuedOperations[(int)priority];
 					if (queue.Count > 0)

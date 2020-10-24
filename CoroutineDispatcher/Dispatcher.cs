@@ -30,11 +30,6 @@ namespace CoroutineDispatcher
 			}
 		}
 
-		public void Stop()
-		{
-			_synchronizationContext.Stop();
-		}
-
 		public void Execute()
 		{
 			var oldSynchronizationContext = SynchronizationContext.Current;
@@ -51,6 +46,11 @@ namespace CoroutineDispatcher
 				_current = null;
 				SynchronizationContext.SetSynchronizationContext(oldSynchronizationContext);
 			}
+		}
+
+		public void Stop()
+		{
+			_synchronizationContext.Stop();
 		}
 
 		public static Dispatcher Spawn()

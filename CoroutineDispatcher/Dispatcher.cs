@@ -103,6 +103,18 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
+		/// Creates a new <see cref="Dispatcher"/> and starts it on a new thread.
+		/// </summary>
+		/// <param name="operation">Initial operation</param>
+		/// <seealso cref="Start"/>
+		public static Dispatcher Spawn(Action operation)
+		{
+			var dispatcher = Spawn();
+			dispatcher.Dispatch(DispatchPriority.High, operation);
+			return dispatcher;
+		}
+
+		/// <summary>
 		/// Adds the <paramref name="operation"/> to the operation queue and stops the current thread until it's executed. The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
 		/// </summary>
 		/// <param name="operation">Operation to be queued</param>

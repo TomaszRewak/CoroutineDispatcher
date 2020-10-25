@@ -6,9 +6,7 @@ namespace CoroutineDispatcher
 	internal sealed class TimerQueue
 	{
 		private readonly object _lock = new object();
-		private readonly SortedSet<(DateTime Timestamp, DispatchPriority Priority, Action Action, int Index)> _operations = new SortedSet<(DateTime, DispatchPriority, Action, int)>();
-
-		private int _operationIndex;
+		private readonly SortedDictionary<DateTime, List<(DispatchPriority Priority, Action Operation)>> _operations = new SortedDictionary<DateTime, List<(DispatchPriority Priority, Action Operation)>>();
 
 		public DateTime? Next
 		{
@@ -18,42 +16,39 @@ namespace CoroutineDispatcher
 				{
 					var enumerator = _operations.GetEnumerator();
 					return enumerator.MoveNext()
-						? enumerator.Current.Timestamp
+						? enumerator.Current.Key
 						: (DateTime?)null;
 				}
 			}
 		}
 
-		public void Enqueue(DateTime timestamp, DispatchPriority priority, Action action)
+		public void Enqueue(DateTime timestamp, DispatchPriority priority, Action operation)
 		{
 			lock (_lock)
 			{
-				unchecked { _operationIndex++; }
-				_operations.Add((timestamp, priority, action, _operationIndex));
+				if (_operations.TryGetValue(timestamp, out var stampedOperations))
+					stampedOperations.Add((priority, operation));
+				else
+					_operations.Add(timestamp, new List<(DispatchPriority Priority, Action Operation)> { (priority, operation) });
 			}
 		}
 
-		public bool TryDequeue(out DispatchPriority priority, out Action action)
+		public bool TryDequeue(out List<(DispatchPriority Priority, Action Operation)> operations)
 		{
 			lock (_lock)
 			{
 				var enumerator = _operations.GetEnumerator();
-				if (enumerator.MoveNext() && enumerator.Current.Timestamp <= DateTime.UtcNow)
+				if (enumerator.MoveNext() && enumerator.Current.Key <= DateTime.UtcNow)
 				{
-					priority = enumerator.Current.Priority;
-					action = enumerator.Current.Action;
-
-					_operations.Remove(enumerator.Current);
+					operations = enumerator.Current.Value;
+					_operations.Remove(enumerator.Current.Key);
 
 					return true;
 				}
-				else
-				{
-					priority = default;
-					action = default;
-					return false;
-				}
 			}
+
+			operations = default;
+			return false;
 		}
 	}
 }

@@ -121,8 +121,9 @@ namespace CoroutineDispatcher
 
 		private void FlushTimerQueue()
 		{
-			while (_timerQueue.TryDequeue(out var priority, out var action))
-				Post(priority, action);
+			while (_timerQueue.TryDequeue(out var operations))
+				foreach (var (priority, operation) in operations)
+					Post(priority, operation);
 		}
 	}
 }

@@ -25,6 +25,12 @@ namespace CoroutineDispatcher.Test
 		private void Dispatch(DispatchPriority priority, Action action) => _dispatcher.Dispatch(priority, action);
 		private void Dispatch(Func<Task> action) => _dispatcher.Dispatch(action);
 		private void Dispatch(DispatchPriority priority, Func<Task> action) => _dispatcher.Dispatch(priority, action);
+		private void Schedule(TimeSpan timeSpan, Action action) => _dispatcher.Schedule(timeSpan, action);
+		private void Schedule(TimeSpan timeSpan, DispatchPriority priority, Action action) => _dispatcher.Schedule(timeSpan, priority, action);
+		private void Invoke(Action action) => _dispatcher.Invoke(action);
+		private void Invoke(DispatchPriority priority, Action action) => _dispatcher.Invoke(priority, action);
+		private T Invoke<T>(Func<T> func) => _dispatcher.Invoke(func);
+		private T Invoke<T>(DispatchPriority priority, Func<T> func) => _dispatcher.Invoke(priority, func);
 
 		private void Execute() => _dispatcher.Execute();
 		private void Start() => _dispatcher.Start();

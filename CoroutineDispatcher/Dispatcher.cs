@@ -64,20 +64,22 @@ namespace CoroutineDispatcher
 			return dispatcher;
 		}
 
-		public void Invoke(Action operation)
-		{
-			Invoke(DispatchPriority.Medium, operation);
-		}
-
+		public void Invoke(Action operation) => Invoke(DispatchPriority.Medium, operation);
 		public void Invoke(DispatchPriority priority, Action operation)
 		{
-			_synchronizationContext.Send(priority, operation);
+			if (this == Current)
+				operation();
+			else
+				_synchronizationContext.Send(priority, operation);
 		}
 
-		public T Invoke<T>(Func<T> operation) => InvokeAsync(operation).Result;
+		public T Invoke<T>(Func<T> operation) => Invoke(DispatchPriority.Medium, operation);
 		public T Invoke<T>(DispatchPriority priority, Func<T> operation)
 		{
-			return InvokeAsync(priority, operation).Result;
+			if (this == Current)
+				return operation();
+			else
+				return InvokeAsync(priority, operation).Result;
 		}
 
 		public Task InvokeAsync(Action operation) => InvokeAsync(DispatchPriority.Medium, operation);

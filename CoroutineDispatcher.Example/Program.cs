@@ -6,7 +6,7 @@ namespace CoroutineDispatcher.Example
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
 		{
 			var dispatcher = new Dispatcher();
 
@@ -19,7 +19,7 @@ namespace CoroutineDispatcher.Example
 			Console.WriteLine($"NormalAction {Thread.CurrentThread.ManagedThreadId}");
 		}
 
-		static async ValueTask AsyncAction1()
+		static async Task AsyncAction1()
 		{
 			Console.WriteLine($"AsyncAction1 {Thread.CurrentThread.ManagedThreadId}");
 
@@ -30,7 +30,7 @@ namespace CoroutineDispatcher.Example
 			await Dispatcher.Yield(DispatchPriority.Medium);
 		}
 
-		static async ValueTask AsyncAction2()
+		static async Task AsyncAction2()
 		{
 			Console.WriteLine($"AsyncAction2 {Thread.CurrentThread.ManagedThreadId}");
 

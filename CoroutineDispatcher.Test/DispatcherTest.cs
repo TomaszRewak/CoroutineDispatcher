@@ -356,5 +356,32 @@ namespace CoroutineDispatcher.Test
 			Execute();
 			AssertTotalCalls(5);
 		}
+
+		[TestMethod]
+		public void InvokedOperationCanByAsynchronous()
+		{
+			Dispatch(() =>
+			{
+				AssertCall(1);
+				Task.Run(async () =>
+				{
+					AssertSecondThreadCall(2);
+					Assert.AreEqual(123, await InvokeAsync(async () =>
+					{
+						AssertCall(3);
+						Dispatch(() => AssertCall(5));
+						AssertCall(4);
+						await Task.Delay(100);
+						AssertCall(6);
+						return 123;
+					}));
+					AssertSecondThreadCall(7);
+					Stop();
+				});
+			});
+
+			Start();
+			AssertTotalCalls(7);
+		}
 	}
 }

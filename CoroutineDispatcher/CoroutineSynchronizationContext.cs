@@ -98,22 +98,6 @@ namespace CoroutineDispatcher
 			_waitToken?.Cancel();
 		}
 
-		public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
-		{
-			throw new NotImplementedException();
-			//return base.Wait(waitHandles, waitAll, millisecondsTimeout);
-		}
-
-		//public override void OperationStarted()
-		//{
-		//	base.OperationStarted();
-		//}
-
-		//public override void OperationCompleted()
-		//{
-		//	base.OperationCompleted();
-		//}
-
 		internal bool HasQueuedTasks(DispatchPriority priority)
 		{
 			return _operationQueue.Any(priority);

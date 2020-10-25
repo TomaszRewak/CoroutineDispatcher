@@ -71,7 +71,7 @@ namespace CoroutineDispatcher
 		/// Stops the current execution that was started be either calling the <see cref="Start()"/> or the <see cref="Execute()"/> method.
 		/// </summary>
 		/// <remarks>
-		/// If called from within an operation currently executed by dispatcher, the operation itself will not be terminated, but no new operations will be acquired from the operation queue once the current operation finishes or yields. 
+		/// If called from within an operation currently executed by the dispatcher, the operation itself will not be terminated, but no new operations will be acquired from the operation queue once the current operation finishes or yields. 
 		/// </remarks>
 		public void Stop()
 		{
@@ -90,6 +90,7 @@ namespace CoroutineDispatcher
 		/// <summary>
 		/// Creates a new <see cref="Dispatcher"/> and starts it on a new thread.
 		/// </summary>
+		/// <seealso cref="Start"/>
 		public static Dispatcher Spawn()
 		{
 			var dispatcher = new Dispatcher();
@@ -204,12 +205,12 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
-		/// Adds the <paramref name="operation"/> to the operation queue without blocking the current thread (fire and forget). The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
+		/// Adds the <paramref name="operation"/> to the operation queue without blocking of the current thread (fire and forget). The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
 		/// </summary>
 		/// <param name="operation">Operation to be queued</param>
 		public void Dispatch(Action operation) => Dispatch(DispatchPriority.Medium, operation);
 		/// <summary>
-		/// Adds the <paramref name="operation"/> to the operation queue without blocking the current thread (fire and forget).
+		/// Adds the <paramref name="operation"/> to the operation queue without blocking of the current thread (fire and forget).
 		/// </summary>
 		/// <param name="priority">Priority of the operation</param>
 		/// <param name="operation">Operation to be queued</param>
@@ -219,12 +220,12 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
-		/// Adds the asynchronous <paramref name="operation"/> to the operation queue without blocking the current thread (fire and forget). The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
+		/// Adds the asynchronous <paramref name="operation"/> to the operation queue without blocking of the current thread (fire and forget). The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
 		/// </summary>
 		/// <param name="operation">Operation to be queued</param>
 		public void Dispatch(Func<Task> operation) => Dispatch(DispatchPriority.Medium, operation);
 		/// <summary>
-		/// Adds the asynchronous <paramref name="operation"/> to the operation queue without blocking the current thread (fire and forget).
+		/// Adds the asynchronous <paramref name="operation"/> to the operation queue without blocking of the current thread (fire and forget).
 		/// </summary>
 		/// <param name="priority">Priority of the operation</param>
 		/// <param name="operation">Operation to be queued</param>
@@ -234,21 +235,21 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
-		/// Schedules the queuing of the <paramref name="operation"/> after the provided <paramref name="delay"/>. The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
+		/// Schedules the execution of the <paramref name="operation"/> after the provided <paramref name="delay"/>. The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
 		/// </summary>
 		/// <param name="delay"></param>
 		/// <param name="operation">Operation to be scheduled</param>
 		/// <remarks>
-		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be executed not sooner then that).
+		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be queued not sooner then that).
 		/// </remarks>
 		public void Schedule(TimeSpan delay, Action operation) => Schedule(delay, DispatchPriority.Medium, operation);
 		/// <summary>
-		/// Schedules the queuing of the <paramref name="operation"/> after the provided <paramref name="delay"/>.
+		/// Schedules the execution of the <paramref name="operation"/> after the provided <paramref name="delay"/>.
 		/// </summary>
 		/// <param name="delay"></param>
 		/// <param name="operation">Operation to be scheduled</param>
 		/// <remarks>
-		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be executed not sooner then that).
+		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be queued not sooner then that).
 		/// </remarks>
 		public void Schedule(TimeSpan delay, DispatchPriority priority, Action operation)
 		{
@@ -256,21 +257,21 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
-		/// Schedules the queuing of the asynchronous <paramref name="operation"/> after the provided <paramref name="delay"/>. The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
+		/// Schedules the execution of the asynchronous <paramref name="operation"/> after the provided <paramref name="delay"/>. The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
 		/// </summary>
 		/// <param name="delay"></param>
 		/// <param name="operation">Operation to be scheduled</param>
 		/// <remarks>
-		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be executed not sooner then that).
+		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be queued not sooner then that).
 		/// </remarks>
 		public void Schedule(TimeSpan delay, Func<Task> operation) => Schedule(delay, DispatchPriority.Medium, operation);
 		/// <summary>
-		/// Schedules the queuing of the <paramref name="operation"/> after the provided <paramref name="delay"/>.
+		/// Schedules the execution of the <paramref name="operation"/> after the provided <paramref name="delay"/>.
 		/// </summary>
 		/// <param name="delay"></param>
 		/// <param name="operation">Operation to be scheduled</param>
 		/// <remarks>
-		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be executed not sooner then that).
+		/// It is not guaranteed that the <paramref name="operation"/> will be executed exactly after the provided <paramref name="delay"/> (it's only guaranteed that it will be queued not sooner then that).
 		/// </remarks>
 		public void Schedule(TimeSpan delay, DispatchPriority priority, Func<Task> operation)
 		{
@@ -278,13 +279,13 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
-		/// When awaited, will yield the execution of the current dispatcher to other queued operations with at least <paramref name="minPriority"/>.
+		/// When awaited, will yield the execution of the current dispatcher to other queued operations with at least <paramref name="priority"/>.
 		/// </summary>
-		/// <param name="minPriority">The priority of operations to be executed</param>
+		/// <param name="priority">The priority of operations to be executed</param>
 		/// <exception cref="DispatcherException">Throws the <see cref="DispatcherException"/> if no dispatcher is currently running on the calling thread.</exception>
-		public static YieldTask Yield(DispatchPriority minPriority = DispatchPriority.Low)
+		public static YieldTask Yield(DispatchPriority priority = DispatchPriority.Low)
 		{
-			return new YieldTask(minPriority);
+			return new YieldTask(priority);
 		}
 	}
 }

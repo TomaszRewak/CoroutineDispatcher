@@ -6,26 +6,26 @@ namespace CoroutineDispatcher
 {
 	public readonly struct YieldTask
 	{
-		private readonly DispatchPriority _minPriority;
+		private readonly DispatchPriority _priority;
 
-		public YieldTask(DispatchPriority minPriority)
+		public YieldTask(DispatchPriority priority)
 		{
-			_minPriority = minPriority;
+			_priority = priority;
 		}
 
 		public YieldTaskAwaiter GetAwaiter()
 		{
-			return new YieldTaskAwaiter(_minPriority);
+			return new YieldTaskAwaiter(_priority);
 		}
 	}
 
 	public readonly struct YieldTaskAwaiter : INotifyCompletion
 	{
-		private readonly DispatchPriority _minPriority;
+		private readonly DispatchPriority _priority;
 		
-		public YieldTaskAwaiter(DispatchPriority minPriority)
+		public YieldTaskAwaiter(DispatchPriority priority)
 		{
-			_minPriority = minPriority;
+			_priority = priority;
 		}
 
 		public bool IsCompleted
@@ -35,7 +35,7 @@ namespace CoroutineDispatcher
 				if (!(SynchronizationContext.Current is CoroutineSynchronizationContext context))
 					throw new DispatcherException("Awaiting Dispatcher.Yield outside of CoroutineSynchronizationContext");
 
-				return !context.HasQueuedTasks(_minPriority);
+				return !context.HasQueuedTasks(_priority);
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace CoroutineDispatcher
 			if (!(SynchronizationContext.Current is CoroutineSynchronizationContext context))
 				throw new DispatcherException("Awaiting Dispatcher.Yield outside of CoroutineSynchronizationContext");
 
-			context.Post(_minPriority, continuation);
+			context.Post(_priority, continuation);
 		}
 
 		public void GetResult()

@@ -29,7 +29,7 @@ namespace CoroutineDispatcher
 				if (_operations.TryGetValue(timestamp, out var stampedOperations))
 					stampedOperations.Add((priority, operation));
 				else
-					_operations.Add(timestamp, new List<(DispatchPriority Priority, Action Operation)> { (priority, operation) });
+					_operations.Add(timestamp, new List<(DispatchPriority, Action)> { (priority, operation) });
 			}
 		}
 

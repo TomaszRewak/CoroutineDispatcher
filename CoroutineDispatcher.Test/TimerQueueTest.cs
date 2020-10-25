@@ -11,7 +11,7 @@ namespace CoroutineDispatcher.Test
 		[TestMethod]
 		public void EmptyCollectionHasNothingToDequeue()
 		{
-			AssertDequeue(0);
+			AssertFailDequeue();
 		}
 
 		[TestMethod]
@@ -19,8 +19,8 @@ namespace CoroutineDispatcher.Test
 		{
 			Action operation = () => { };
 
-			Enqueue(DateTime.MinValue, DispatchPriority.Medium, operation);
-			Enqueue(DateTime.MinValue, DispatchPriority.Medium, operation);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, operation);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, operation);
 
 			AssertDequeue(2);
 		}
@@ -28,33 +28,77 @@ namespace CoroutineDispatcher.Test
 		[TestMethod]
 		public void DequeuingOperationsRemovesThem()
 		{
-			Enqueue(DateTime.MinValue, DispatchPriority.Medium);
-			Enqueue(DateTime.MinValue, DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium);
 
 			AssertDequeue(2);
-			AssertDequeue(0);
+			AssertFailDequeue();
 		}
 
 		[TestMethod]
 		public void OnlyPastOperationsAreDequeued()
 		{
-			Enqueue(DateTime.UtcNow.AddSeconds(-2), DispatchPriority.Medium, 1);
-			Enqueue(DateTime.UtcNow.AddSeconds(-1), DispatchPriority.Medium, 2);
-			Enqueue(DateTime.UtcNow.AddSeconds(1), DispatchPriority.Medium, 3);
-			Enqueue(DateTime.UtcNow.AddSeconds(2), DispatchPriority.Medium, 4);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, 1);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, 2);
+			Enqueue(TimeSpan.FromSeconds(1), DispatchPriority.Medium, 3);
+			Enqueue(TimeSpan.FromSeconds(1), DispatchPriority.Medium, 4);
 
 			AssertDequeue(new[] { 1, 2 });
+			AssertFailDequeue();
 		}
 
 		[TestMethod]
 		public void DequeuingIsNotImpactedByEnqueuingOrder()
 		{
-			Enqueue(DateTime.UtcNow.AddSeconds(-2), DispatchPriority.Medium, 1);
-			Enqueue(DateTime.UtcNow.AddSeconds(1), DispatchPriority.Medium, 2);
-			Enqueue(DateTime.UtcNow.AddSeconds(2), DispatchPriority.Medium, 3);
-			Enqueue(DateTime.UtcNow.AddSeconds(-1), DispatchPriority.Medium, 4);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, 1);
+			Enqueue(TimeSpan.FromSeconds(1), DispatchPriority.Medium, 2);
+			Enqueue(TimeSpan.FromSeconds(1), DispatchPriority.Medium, 3);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, 4);
 
 			AssertDequeue(new[] { 1, 4 });
+		}
+
+		[TestMethod]
+		public void OnlyTheOldestOperatinosAreDequeuedInASingleStep()
+		{
+			Enqueue(TimeSpan.FromSeconds(-2), DispatchPriority.Medium, 1);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, 2);
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium, 3);
+			Enqueue(TimeSpan.FromSeconds(1), DispatchPriority.Medium, 4);
+
+			AssertDequeue(new[] { 1 });
+			AssertDequeue(new[] { 2, 3 });
+			AssertFailDequeue();
+		}
+
+		[TestMethod]
+		public void EmptyQueueHasNoNextDate()
+		{
+			AssertNoNext();
+		}
+
+		[TestMethod]
+		public void NextReturnsTheEarliestDate()
+		{
+			Enqueue(TimeSpan.FromSeconds(-1), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(-4), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(-2), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(6), DispatchPriority.Medium);
+
+			AssertNext(TimeSpan.FromSeconds(-4));
+		}
+
+		[TestMethod]
+		public void NextIsUpdatedAfterDequeuing()
+		{
+			Enqueue(TimeSpan.FromSeconds(-4), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(-4), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(3), DispatchPriority.Medium);
+			Enqueue(TimeSpan.FromSeconds(7), DispatchPriority.Medium);
+
+			AssertDequeue(2);
+
+			AssertNext(TimeSpan.FromSeconds(3));
 		}
 	}
 }

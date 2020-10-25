@@ -10,36 +10,56 @@ namespace CoroutineDispatcher.Test
 	{
 		private TimerQueue _queue;
 		private List<int> _dequeuedValues;
+		private DateTime _now;
 
 		[TestInitialize]
 		public void Setup()
 		{
 			_queue = new TimerQueue();
 			_dequeuedValues = new List<int>();
+			_now = DateTime.UtcNow;
 		}
 
-		private void Enqueue(DateTime dateTime, DispatchPriority priority, Action action)
+		private void Enqueue(TimeSpan timeSpan, DispatchPriority priority, Action action)
 		{
-			_queue.Enqueue(dateTime, priority, action);
+			_queue.Enqueue(_now.Add(timeSpan), priority, action);
 		}
 
-		private void Enqueue(DateTime dateTime, DispatchPriority priority, int value = 0)
+		private void Enqueue(TimeSpan timeSpan, DispatchPriority priority, int value = 0)
 		{
-			_queue.Enqueue(dateTime, priority, () => _dequeuedValues.Add(value));
+			_queue.Enqueue(_now.Add(timeSpan), priority, () => _dequeuedValues.Add(value));
 		}
 
 		private void AssertDequeue(int count)
 		{
-			Assert.AreEqual(count, _queue.Dequeue().Count);
+			Assert.IsTrue(_queue.TryDequeue(out var operations));
+			Assert.AreEqual(count, operations.Count);
+		}
+
+		private void AssertFailDequeue()
+		{
+			Assert.IsFalse(_queue.TryDequeue(out var _));
 		}
 
 		private void AssertDequeue(int[] values)
 		{
+			Assert.IsTrue(_queue.TryDequeue(out var operations));
+
 			_dequeuedValues.Clear();
-			foreach (var (_, action) in _queue.Dequeue())
-				action();
+			foreach (var (_, operation) in operations)
+				operation();
 
 			CollectionAssert.AreEquivalent(values, _dequeuedValues);
+		}
+
+		private void AssertNoNext()
+		{
+			Assert.IsNull(_queue.Next);
+		}
+
+		private void AssertNext(TimeSpan timeSpan)
+		{
+			Assert.AreEqual(_now.Add(timeSpan), _queue.Next);
 		}
 	}
 }

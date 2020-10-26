@@ -22,7 +22,11 @@ On top of that simple concept the CoroutineDispatcher provides a handful of usef
 
 ### How to use it?
 
-Simply create a `Dispatcher`, queue (or not) some operations and start the execution.
+First: install the package in your project.
+
+`> dotnet add package CoroutineDispatcher`
+
+And then: simply create a `Dispatcher`, queue (or not) some operations and start the execution.
 
 ```csharp
 var dispatcher = new Dispatcher();

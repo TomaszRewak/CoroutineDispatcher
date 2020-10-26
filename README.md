@@ -1,6 +1,6 @@
 # CoroutineDispatcher
 
-`CoroutineDispatcher` is a light framework for running multiple tasks asynchronously on a single thread.
+CoroutineDispatcher is a light framework for running multiple tasks asynchronously on a single thread.
 
 ### Why?
 

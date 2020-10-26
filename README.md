@@ -140,31 +140,119 @@ Returns `true` if this instance of the `Dispatcher` is currently running on the 
 
 Creates a new `Dispatcher` and starts it on a new thread.
 
+### `void Dispatcher.Dispatch(...)`
+###### `void Dispatch([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
+###### `void Dispatch([DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
+
+Adds the `operation` to the operation queue without blocking of the current thread (fire and forget).
+
+```
+═════════ dispatcher2.Dispatch(...) ═════════
+
+dispatcher1      dispatcher2      thread_pool
+     │                │                ║     
+     ∩                │                ║     
+     ║                ∩                ║     
+     ╟───────┐        ║                ║     
+     ║       │        U                ║     
+     U       └────────╖                ║     
+     ∩                ║       ┌────────╢     
+     ║                U       │        ║     
+     ║                ∩       │        ║     
+     ║           ┌────╢       │        ║     
+     U           │    U       │        ║     
+     │           │    ╓───────┘        ║     
+     ∩           │    ║                ║     
+     ║           │    U                ║     
+     U           └────╖                ║     
+     │                ║                ║       
+```
+
 ### `... Dispatcher.Invoke(...)`
-###### `void Invoke(Action operation)`
-###### `T Invoke<T>(Func<T> operation)`
-###### `void Invoke(DispatchPriority priority, Action operation)`
-###### `T Invoke<T>(DispatchPriority priority, Func<T> operation)`
+###### `void Invoke([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
+###### `T Invoke<T>([DispatchPriority priority = DispatchPriority.Medium,] Func<T> operation)`
 
 Adds the `operation` to the operation queue and stops the current thread until it's executed.
 
 ```
+══════════ dispatcher2.Invoke(...) ══════════
+
 dispatcher1      dispatcher2      thread_pool
-     |                |                ‖     
-     ∩                |                ‖     
-     ‖  d2.Invoke()   ∩                ‖     
-     ╙-------┐        ‖                ‖     
-     .       |        U                ‖     
-     .       └--------╖   d2.Invoke()  ‖     
-     .                ‖       ┌--------╜     
-     .                ‖       |        .     
-     ╓----------------╜       |        .     
-     ‖                ∩       |        .     
-     U                U       |        .     
-     |                ╓-------┘        .     
-     ∩                ‖                .     
-     ‖                ╙----------------╖     
-     U                |                ‖     
+     │                │                ║     
+     ∩                │                ║     
+     ║                ∩                ║     
+     ╙───────┐        ║                ║     
+     .       │        U                ║     
+     .       └────────╖                ║     
+     .                ║       ┌────────╜     
+     .                ║       │        .     
+     ╓────────────────╜       │        .     
+     ║                ∩       │        .     
+     U                U       │        .     
+     │                ╓───────┘        .     
+     ∩                ║                .     
+     ║                ╙────────────────╖     
+     U                │                ║            
+```
+
+### `... Dispatcher.InvokeAsync(...)`
+###### `Task InvokeAsync([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
+###### `Task InvokeAsync([DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
+###### `Task<T> InvokeAsync<T>([DispatchPriority priority = DispatchPriority.Medium,] Func<T> operation)`
+###### `Task<T> InvokeAsync<T>([DispatchPriority priority = DispatchPriority.Medium,] Func<Task<T>> operation)`
+
+```
+═══════ dispatcher2.InvokeAsync(...) ════════
+
+dispatcher1      dispatcher2      thread_pool
+     │                │               ║ │    
+     ∩                │               ║ │    
+     ║                ∩               ║ │    
+     ╙───────┐        ║               ║ │    
+     │       │        U               ║ │    
+     ∩       └────────╖               ║ │    
+     ║                ║       ┌───────╜ │    
+     ║                ║       │       │ │    
+     ║       ┌────────╜       │       │ │    
+     U       │        ∩       │       │ │    
+     ╓───────┘        U       │       │ │    
+     ║                ╓───────┘       │ │    
+     U                ║               │ │    
+     ∩                ╙───────────────┼ ╖    
+     U                │               │ ║   
+```
+
+### `void Schedule(...)`
+##### `void Schedule(TimeSpan delay, [DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
+##### `void Schedule(TimeSpan delay, [DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
+
+Schedules the execution of the `operation` after the provided `delay`. 
+
+It is not guaranteed that the `operation` will be executed exactly after the provided `delay` (it's only guaranteed that it will be queued not sooner then that).
+
+### `static YieldTask Dispatcher.Yield(DispatchPriority priority = DispatchPriority.Low)`
+
+When awaited, will yield the execution of the current dispatcher to other queued operations with at least `priority`.
+
+```
+════════ await Dispatcher.Yield(...) ════════
+
+                  dispatcher                 
+                      │                      
+                      │                      
+                      ∩                      
+                      ║                      
+                 ┌────╜                      
+                 │    ∩                      
+                 │    ║                      
+                 │    U                      
+                 │    ∩                      
+                 │    ║                      
+                 │    U                      
+                 └────╖                      
+                      ║                      
+                      U                      
+                      │                      
 ```
 
 # Contributions

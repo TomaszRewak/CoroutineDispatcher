@@ -115,33 +115,33 @@ Once you are done with the Dispatcher you can also simply call the `Stop()` meth
 And that's it from the most essential basics. Maybe not much, but for many use cases more then enough.
 
 
-## The `CoroutineDispatcher.Dispatcher` class
+### The `CoroutineDispatcher.Dispatcher` class
 
-### `Dispatcher Dispatcher.Current { get; }`
+##### `Dispatcher Dispatcher.Current { get; }`
 
 Returns a `Dispatcher` currently running on the calling thread. By using it you don't have to pass around the reference to your dispatcher.
 
-### `void Dispatcher.Start()`
+##### `void Dispatcher.Start()`
 
 Starts an infinite loop on the current thread to process all queued and scheduled operations. Once the queue of operations is empty, waits for new ones to arrive.
 
-### `void Dispatcher.Stop()`
+##### `void Dispatcher.Stop()`
 
 Stops the current execution. If called from within an operation currently executed by the dispatcher, the operation itself will not be terminated, but no new operations will be acquired from the operation queue once the current operation finishes or yields.
 
-### `void Dispatcher.Execute()`
+##### `void Dispatcher.Execute()`
 
 Processes all queued operations until the active operation queue is empty. Performed execution will include all due scheduled operations, but will not wait for operations scheduled for after the active operation queue has been emptied nor the callbacks of awaited operations that did not finish yet.
 
-### `bool Dispatcher.CheckAccess()`
+##### `bool Dispatcher.CheckAccess()`
 
 Returns `true` if this instance of the `Dispatcher` is currently running on the calling thread.
 
-### `static Dispatcher Dispatcher.Spawn()`
+##### `static Dispatcher Dispatcher.Spawn()`
 
 Creates a new `Dispatcher` and starts it on a new thread.
 
-### `void Dispatcher.Dispatch(...)`
+##### `void Dispatcher.Dispatch(...)`
 ###### `void Dispatch([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
 ###### `void Dispatch([DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
 
@@ -169,7 +169,7 @@ dispatcher1      dispatcher2      thread_pool
      │                ║                ║       
 ```
 
-### `... Dispatcher.Invoke(...)`
+##### `... Dispatcher.Invoke(...)`
 ###### `void Invoke([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
 ###### `T Invoke<T>([DispatchPriority priority = DispatchPriority.Medium,] Func<T> operation)`
 
@@ -198,7 +198,7 @@ dispatcher1      dispatcher2      thread_pool
      U                │                ║            
 ```
 
-### `... Dispatcher.InvokeAsync(...)`
+##### `... Dispatcher.InvokeAsync(...)`
 ###### `Task InvokeAsync([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
 ###### `Task InvokeAsync([DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
 ###### `Task<T> InvokeAsync<T>([DispatchPriority priority = DispatchPriority.Medium,] Func<T> operation)`
@@ -227,15 +227,15 @@ dispatcher1      dispatcher2      thread_pool
      U                │               │ ║   
 ```
 
-### `void Schedule(...)`
-##### `void Schedule(TimeSpan delay, [DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
-##### `void Schedule(TimeSpan delay, [DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
+##### `void Schedule(...)`
+###### `void Schedule(TimeSpan delay, [DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
+###### `void Schedule(TimeSpan delay, [DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
 
 Schedules the execution of the `operation` after the provided `delay`. 
 
 It is not guaranteed that the `operation` will be executed exactly after the provided `delay` (it's only guaranteed that it will be queued not sooner then that).
 
-### `static YieldTask Dispatcher.Yield(DispatchPriority priority = DispatchPriority.Low)`
+##### `static YieldTask Dispatcher.Yield(DispatchPriority priority = DispatchPriority.Low)`
 
 When awaited, will yield the execution of the current dispatcher to other queued operations with at least given `priority`.
 

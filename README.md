@@ -114,7 +114,8 @@ Once you are done with the Dispatcher you can also simply call the `Stop()` meth
 
 And that's it from the most essential basics. Maybe not much, but for many use cases more then enough.
 
-# `CoroutineDispatcher.Dispatcher`
+
+## The `CoroutineDispatcher.Dispatcher` class
 
 ### `Dispatcher Dispatcher.Current { get; }`
 

@@ -32,7 +32,7 @@ Second: simply create a `Dispatcher`, queue (or not) some operations and start t
 var dispatcher = new Dispatcher();
 
 void F1() =>
-dispatcher.Dispatch(DispatchPriority.Medium, () =>
+dispatcher.Dispatch(() =>
 {
 	Console.Write(4)
 });

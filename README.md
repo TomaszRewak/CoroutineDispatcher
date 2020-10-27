@@ -4,17 +4,17 @@ CoroutineDispatcher is a lightweight framework for running multiple tasks asynch
 
 ### Why?
 
-With heavily multi-threaded applications it can be difficult to manage data synchronization and ownership. Performing all related operations on a single thread can help in achieving cleaner and better organized code. In some cases it can even result in a better performing application. 
+With heavily multi-threaded applications it can be difficult to manage data synchronization and ownership. Performing all related operations on a single thread can help in achieving much more predictable behavior with a code that's much easier to maintain. In some cases it can even result in a better performance. 
 
 Of course it doesn’t mean that one has to be limited to just a single thread. The CoroutineDispatcher can be used to spawn multiple independent task queues that can communicate with each other by dispatching tasks on one another. 
 
 ### Inspiration
 
-The `CoroutineDispatcher` is strongly inspired by the `System.Windows.Dispatcher` used within the WPF framework. Just instead of using the default windows message pump, it relays on a basic operation queue that is consumed within a relatively simple execution loop.
+The `CoroutineDispatcher` is strongly inspired by the `System.Windows.Dispatcher` used within the WPF framework. Just instead of using the default Windows message pump, it relays on a basic operation queue that is consumed within a relatively simple execution loop.
 
 ### What is it?
 
-The heart of the `CoroutineDispatcher` is the `Dispatcher` class. You can think of it as a fancy priority queue that stores tasks to be run. By starting the `Dispatcher` you initialize an infinite loop that processes queued operations and waits for new ones once that list is empty.
+The heart of the `CoroutineDispatcher` is the `Dispatcher` class. You can think of it as a fancy priority queue that stores tasks to be run. By starting the `Dispatcher` you initialize an infinite loop that processes queued operations and waits for new ones once the list is empty.
 
 Tasks can be scheduled beforehand or during execution (both from the thread on which the dispatcher is currently running as well as other threads).
 
@@ -26,7 +26,7 @@ First: install the package in your project.
 
 `> dotnet add package CoroutineDispatcher`
 
-And then: simply create a `Dispatcher`, queue (or not) some operations and start the execution.
+Second: simply create a `Dispatcher`, queue (or not) some operations and start the execution.
 
 ```csharp
 var dispatcher = new Dispatcher();
@@ -43,7 +43,7 @@ dispatcher.Dispatch(DispatchPriority.Medium, () => Console.Write(4));
 dispatcher.Start(); // Prints "12345" and waits for new operations 
 ```
 
-The `Dispatch` method is the simples of the task queueing operations. It’s a basic “fire and forget” used when the calling thread is not interested in the result of the execution. 
+The `Dispatch` method is the simples of the task queueing operations. It’s a basic “fire and forget” used when the calling thread is not interested in the result of the task execution. 
 
 An alternative to the `Dispatch` method is the `Invoke` method. It also queues the task on the dispatcher, but stops the calling thread until the execution of that task is over. It allows us not only to synchronize threads, but also easily acquire results of computations.
 
@@ -61,7 +61,7 @@ Task.Run(() => {
 dispatcher.Start();
 ```
 
-(Please excuse the amount of lambdas used in those examples - it's easier to create simple and compact snippets this way)
+(Please excuse the amount of lambdas used in those examples - it's just easier to create simple and compact snippets this way)
 
 The `CoroutineDispatcher` (of course) also provides support for dispatching asynchronous operations.
 
@@ -104,7 +104,7 @@ dispatcher.Dispatch(async () =>
 dispatcher.Start(); // Will print "1234"
 ```
 
-The last but not least trick is task scheduling. It can be used to plan a one-off delayed event or create recurring timer operations.
+The last but not least is the task scheduling. It can be used run a task after a specified delay.
 
 ```csharp
 var dispatcher = new Dispatcher();
@@ -114,9 +114,37 @@ dispatcher.Schedule(TimeSpan.FromSeconds(30), () => Console.Write("At least 30 s
 dispatcher.Start();
 ```
 
-Once you are done with the Dispatcher you can also simply call the `Stop()` method. It will not terminate the currently executed task, but will prevent the dispatcher from consuming any new ones. But don’t worry - queued tasks are not lost. Calling `Start()` again will resume the processing from where it was left on.
+Once you are done with a Dispatcher you can simply call the `Stop()` method. It will not terminate the currently running task, but will prevent the dispatcher from consuming any new ones. But don’t worry - queued tasks are not lost. Calling `Start()` again will resume the processing from where it was left off.
 
-And that's it from the most essential basics. Maybe not much, but for many use cases more then enough.
+And that's it from the most essential basics. Maybe not much - but for many use cases - more then enough.
+
+At the end, just as a hint, I want to share that I've found the following pattern to be the most handy when working with tasks management in systems with multiple dispatchers.
+
+```
+internal sealed class Consumer
+{
+	private readonly Dispatcher _dispatcher = Dispatcher.Spawn();
+
+	public void Consume(string item) =>
+	_dispatcher.Dispatch(async () =>
+	{
+		...
+	});
+
+	public Task<int> GetCount() =>
+	_dispatcher.InvokeAsync(() =>
+	{
+		...
+	});
+
+	private async Task<bool> CheckOnTheServer(string item)
+	{
+		...
+	}
+}
+```
+
+So instead of making it a responsibility of the caller to know where to dispatch an operation - in this pattern we annotate the public interface of a component owning the resources with correct task management operations to make sure that the work is always performed on a correct thread.
 
 
 ### The `CoroutineDispatcher.Dispatcher` class

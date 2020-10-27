@@ -71,12 +71,15 @@ An alternative to the `Dispatch` method is the `Invoke` method. It also queues t
 ```csharp
 var dispatcher = new Dispatcher();
 
+void Add(int a, int b) =>
+dispatcher.Invoke(() => {
+	return a + b; // This executes on the dispatcher thread along with other operations (a and b are captured in a closure)
+});
+
 Task.Run(() => {
 	int a = 2, b = 2; // This executes on a separate thread
-	var sum = dispatcher.Invoke(() => {
-		return a + b; // This executes on the dispatcher thread along with other operations (a and b are captured in a closure)
-	});
-	Console.Write(sum); // And here we are on a background thread again
+	var sum = Add(a, b);
+	Console.Write(sum); // And here we are on the background thread again
 });
 
 dispatcher.Start();
@@ -139,7 +142,7 @@ Once you are done with a Dispatcher you can simply call the `Stop()` method. It 
 
 And that's it from the most essential basics. Maybe not much - but for many use cases - more then enough.
 
-At the end, just as a hint, I want to share that I've found the following pattern (also used in the examples above) to be the most handy when working with tasks management in systems with multiple dispatchers.
+At the end, just as a hint, I want to share that I've found the following pattern (also used in some of the above) to be the most handy when working with tasks management in systems with multiple dispatchers.
 
 ```csharp
 internal sealed class Consumer

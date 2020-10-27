@@ -120,7 +120,7 @@ And that's it from the most essential basics. Maybe not much - but for many use 
 
 At the end, just as a hint, I want to share that I've found the following pattern to be the most handy when working with tasks management in systems with multiple dispatchers.
 
-```
+```csharp
 internal sealed class Consumer
 {
 	private readonly Dispatcher _dispatcher = Dispatcher.Spawn();

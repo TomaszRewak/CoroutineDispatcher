@@ -31,14 +31,35 @@ Second: simply create a `Dispatcher`, queue (or not) some operations and start t
 ```csharp
 var dispatcher = new Dispatcher();
 
+void F1() =>
+dispatcher.Dispatch(DispatchPriority.Low, () =>
+{
+	Console.Write(4)
+});
+
+void F2() =>
+dispatcher.Dispatch(DispatchPriority.High, () =>
+{
+	Console.Write(3)
+});
+
+void F3() =>
+dispatcher.Dispatch(DispatchPriority.Low, () =>
+{
+	Console.Write(5)
+});
+
+void F4() =>
 dispatcher.Dispatch(() =>
 {
 	Console.Write(1);
-	dispatcher.Dispatch(DispatchPriority.High, () => Console.Write(3));
-	dispatcher.Dispatch(DispatchPriority.Low, () => Console.Write(5));
+	F1();
+	F2();
 	Console.Write(2);
 });
-dispatcher.Dispatch(DispatchPriority.Medium, () => Console.Write(4));
+
+F3();
+F4();
 
 dispatcher.Start(); // Prints "12345" and waits for new operations 
 ```
@@ -118,7 +139,7 @@ Once you are done with a Dispatcher you can simply call the `Stop()` method. It 
 
 And that's it from the most essential basics. Maybe not much - but for many use cases - more then enough.
 
-At the end, just as a hint, I want to share that I've found the following pattern to be the most handy when working with tasks management in systems with multiple dispatchers.
+At the end, just as a hint, I want to share that I've found the following pattern (also used in the examples above) to be the most handy when working with tasks management in systems with multiple dispatchers.
 
 ```csharp
 internal sealed class Consumer
@@ -146,6 +167,22 @@ internal sealed class Consumer
 
 So instead of making it a responsibility of the caller to know where to dispatch an operation - in this pattern we annotate the public interface of a component owning the resources with correct task management operations to make sure that the work is always performed on a correct thread.
 
+But we can also reduce the first example in this README to just this:
+
+```csharp
+var dispatcher = new Dispatcher();
+
+dispatcher.Dispatch(() =>
+{
+	Console.Write(1);
+	dispatcher.Dispatch(DispatchPriority.High, () => Console.Write(3));
+	dispatcher.Dispatch(DispatchPriority.Low, () => Console.Write(5));
+	Console.Write(2);
+});
+dispatcher.Dispatch(DispatchPriority.Medium, () => Console.Write(4));
+
+dispatcher.Start(); // Prints "12345" and waits for new operations 
+```
 
 ### The `CoroutineDispatcher.Dispatcher` class
 

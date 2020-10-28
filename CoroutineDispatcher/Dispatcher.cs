@@ -247,6 +247,42 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
+		/// If called for another thread, works similarly to the <seealso cref="Dispatch(DispatchPriority, Action)"/>, but if called from the <see cref="Current"/> thread - executes the <paramref name="operation"/> inline.
+		/// </summary>
+		/// <param name="operation">Operation to be queued</param>
+		public void Run(Action operation) => Run(DispatchPriority.Medium, operation);
+		/// <summary>
+		/// If called for another thread, works similarly to the <seealso cref="Dispatch(Action)"/>, but if called from the <see cref="Current"/> thread - executes the <paramref name="operation"/> inline.
+		/// </summary>
+		/// <param name="priority">Priority of the operation</param>
+		/// <param name="operation">Operation to be queued</param>
+		public void Run(DispatchPriority priority, Action operation)
+		{
+			if (CheckAccess())
+				operation();
+			else
+				Dispatch(priority, operation);
+		}
+
+		/// <summary>
+		/// If called for another thread, works similarly to the <seealso cref="Dispatch(Action)"/>, but if called from the <see cref="Current"/> thread - executes the <paramref name="operation"/> inline.
+		/// </summary>
+		/// <param name="operation">Operation to be queued</param>
+		public void Run(Func<Task> operation) => Run(DispatchPriority.Medium, operation);
+		/// <summary>
+		/// If called for another thread, works similarly to the <seealso cref="Dispatch(DispatchPriority, Func{Task})"/>, but if called from the <see cref="Current"/> thread - executes the <paramref name="operation"/> inline.
+		/// </summary>
+		/// <param name="priority">Priority of the operation</param>
+		/// <param name="operation">Operation to be queued</param>
+		public void Run(DispatchPriority priority, Func<Task> operation)
+		{
+			if (CheckAccess())
+				operation();
+			else
+				Dispatch(priority, operation);
+		}
+
+		/// <summary>
 		/// Schedules the execution of the <paramref name="operation"/> after the provided <paramref name="delay"/>. The operation will be queued with a default <see cref="DispatchPriority.Medium"/> priority.
 		/// </summary>
 		/// <param name="delay"></param>
@@ -291,7 +327,7 @@ namespace CoroutineDispatcher
 		}
 
 		/// <summary>
-		/// When awaited, will yield the execution of the current dispatcher to other queued operations with at least <paramref name="priority"/>.
+		/// When awaited, will yield the execution of the current dispatcher to other queued operations with at least given <paramref name="priority"/>.
 		/// </summary>
 		/// <param name="priority">The priority of operations to be executed</param>
 		/// <exception cref="DispatcherException">Throws the <see cref="DispatcherException"/> if no dispatcher is currently running on the calling thread.</exception>

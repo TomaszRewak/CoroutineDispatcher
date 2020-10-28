@@ -10,9 +10,11 @@
     <PackageProjectUrl>https://github.com/TomaszRewak/CoroutineDispatcher</PackageProjectUrl>
     <RepositoryUrl>https://github.com/TomaszRewak/CoroutineDispatcher</RepositoryUrl>
     <PackageTags>dispatcher, async, threading, coroutines</PackageTags>
-    <PackageReleaseNotes>1.0.0 - First release</PackageReleaseNotes>
+    <PackageReleaseNotes>1.1.0 - Run methods
+1.0.0 - First release</PackageReleaseNotes>
     <Authors>Tomasz Rewak</Authors>
     <Company>Tomasz Rewak</Company>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

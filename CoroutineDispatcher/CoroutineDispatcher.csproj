@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>A lightweight framework for running multiple tasks asynchronously on a single thread.</Description>
+    <Copyright>Tomasz Rewak</Copyright>
+    <PackageProjectUrl>https://github.com/TomaszRewak/CoroutineDispatcher</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TomaszRewak/CoroutineDispatcher</RepositoryUrl>
+    <PackageTags>dispatcher, async, threading, coroutines</PackageTags>
+    <PackageReleaseNotes>1.0.0 - First release</PackageReleaseNotes>
+    <Authors>Tomasz Rewak</Authors>
+    <Company>Tomasz Rewak</Company>
   </PropertyGroup>
 
   <ItemGroup>

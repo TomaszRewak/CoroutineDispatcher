@@ -332,6 +332,12 @@ When awaited, will yield the execution of the current dispatcher to other queued
                       │                      
 ```
 
+##### `void Dispatcher.Run(...)`
+###### `void Run([DispatchPriority priority = DispatchPriority.Medium,] Action operation)`
+###### `void Run([DispatchPriority priority = DispatchPriority.Medium,] Func<Task> operation)`
+
+If called for another thread, works similarly to the `Dispatcher.Dispatch(...)`, but if called from a thread on wich the `Dispatcher.Current` is currently running - executes the `operation` inline.
+
 # Contributions
 
 I'm open to tickets and contributions.
